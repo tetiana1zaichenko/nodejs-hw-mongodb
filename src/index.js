@@ -13,4 +13,4 @@ async function startApp() {
 
 startApp();
 
-setupServer();
+// setupServer();

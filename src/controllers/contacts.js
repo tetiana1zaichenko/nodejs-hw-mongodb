@@ -1,7 +1,9 @@
 import {
   getAllContactsService,
   getContactByIdService,
-} from '../services/contactsService.js';
+  createContact,
+} from '../services/contacts.js';
+
 import createHttpError from 'http-errors';
 
 export async function getContactsController(req, res, next) {
@@ -36,3 +38,26 @@ export async function getContactByIdController(req, res, next) {
     next(error);
   }
 }
+
+export const createContactController = async (req, res, next) => {
+  try {
+    const { name, phoneNumber, contactType } = req.body;
+
+    if (!name || !phoneNumber || !contactType) {
+      throw createHttpError(
+        400,
+        'Missing required fields: name, phoneNumber, or contactType',
+      );
+    }
+
+    const contact = await createContact(req.body);
+
+    res.status(201).json({
+      status: 201,
+      message: 'Successfully created a contact!',
+      data: contact,
+    });
+  } catch (error) {
+    next(error);
+  }
+};

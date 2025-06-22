@@ -15,9 +15,9 @@ export function setupServer() {
 
   app.use('/contacts', contactsRouter);
 
-  app.get('/', (req, res) => {
-    res.send({ message: 'Welcome to the server!' });
-  });
+  // app.get('/', (req, res) => {
+  //   res.send({ message: 'Welcome to the server!' });
+  // });
 
   app.use(notFoundHandler);
 

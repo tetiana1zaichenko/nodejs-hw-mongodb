@@ -9,7 +9,12 @@ import {
 import createHttpError from 'http-errors';
 
 export async function getContactsController(req, res) {
-  const contacts = await getAllContactsService();
+  const page = parseInt(req.query.page) || 1;
+  const perPage = parseInt(req.query.perPage || 10);
+  const contacts = await getAllContactsService({
+    page,
+    perPage,
+  });
   res.status(200).json({
     status: 200,
     message: 'Successfully found contacts!',

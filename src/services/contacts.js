@@ -7,12 +7,25 @@ export async function getAllContactsService({
   perPage,
   sortOrder = SORT_ORDER.ASC,
   sortBy = 'name',
+  type,
+  isFavourite,
 }) {
   const limit = perPage;
   const skip = (page - 1) * perPage;
 
-  const contactsQuery = ContactsModel.find();
-  const contactsCount = await ContactsModel.find()
+  const filter = {};
+
+  if (type) {
+    filter.contactType = type;
+  }
+
+  if (typeof isFavourite !== 'undefined') {
+    // перетворюємо "true" або "false" з query на boolean
+    filter.isFavourite = String(isFavourite).toLowerCase() === 'true';
+  }
+
+  const contactsQuery = ContactsModel.find(filter);
+  const contactsCount = await ContactsModel.find(filter)
     .merge(contactsQuery)
     .countDocuments();
 

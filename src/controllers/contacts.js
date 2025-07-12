@@ -5,9 +5,11 @@ import {
   updateContact,
   deleteContact,
 } from '../services/contacts.js';
-
 import createHttpError from 'http-errors';
 import { parseSortParams } from '../utils/parseSortParams.js';
+import { saveFileToCloudinary } from '../utils/saveFileToCloudinary.js';
+import { getEnvVar } from '../utils/getEnvVar.js';
+import { saveFileToUploadDir } from '../utils/saveFileToUploadDir.js';
 
 export async function getContactsController(req, res) {
   const page = parseInt(req.query.page) || 1;
@@ -65,11 +67,35 @@ export const createContactController = async (req, res) => {
   });
 };
 
-export const patchContactController = async (req, res) => {
+export const patchContactController = async (req, res, next) => {
   const { contactId } = req.params;
-  const updatedContact = await updateContact(contactId, req.body, req.user._id);
+  const photo = req.file;
+
+  let photoUrl;
+
+  if (photo) {
+    photoUrl = await saveFileToUploadDir(photo);
+  }
+
+  // if (photo) {
+  //   if (getEnvVar('ENABLE_CLOUDINARY') === 'true') {
+  //     photoUrl = await saveFileToCloudinary(photo);
+  //   } else {
+  //     photoUrl = await saveFileToUploadDir(photo);
+  //   }
+  // }
+
+  const updatedContact = await updateContact(
+    contactId,
+    {
+      ...req.body,
+      photo: photoUrl,
+    },
+    req.user._id,
+  );
   if (!updatedContact) {
-    throw createHttpError(404, 'Contact not found');
+    next(createHttpError(404, 'Contact not found'));
+    return;
   }
   res.json({
     status: 200,

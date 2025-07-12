@@ -1,3 +1,5 @@
+// import mongoose from 'mongoose';
+// import { model, Schema } from 'mongoose';
 import mongoose, { Schema } from 'mongoose';
 
 const contactSchema = new mongoose.Schema(
@@ -26,6 +28,7 @@ const contactSchema = new mongoose.Schema(
       ref: 'user',
       required: true,
     },
+    photo: { type: String },
   },
   {
     timestamps: true,

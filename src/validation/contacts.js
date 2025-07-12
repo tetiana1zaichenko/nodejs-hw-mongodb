@@ -18,6 +18,7 @@ export const createContactSchema = Joi.object({
     }
     return true;
   }),
+  photo: Joi.string().optional(),
 });
 
 export const updateContactSchema = Joi.object({
@@ -30,4 +31,5 @@ export const updateContactSchema = Joi.object({
     .max(20)
     .valid('work', 'home', 'personal')
     .default('personal'),
+  photo: Joi.string().optional(),
 });

@@ -7,13 +7,10 @@ import { loginUserSchema } from '../validation/auth.js';
 import { loginUserController } from '../controllers/auth.js';
 import { logoutUserController } from '../controllers/auth.js';
 import { refreshUserSessionController } from '../controllers/auth.js';
-// import { authenticate } from '../middlewares/authenticate.js';
-// import { getContactsController } from '../controllers/contacts.js';
+import { requestResetEmailSchema } from '../validation/auth.js';
+import { requestResetEmailController } from '../controllers/auth.js';
 
 const router = Router();
-
-// router.use(authenticate);
-// router.get('/', ctrlWrapper(getContactsController));
 
 router.post(
   '/register',
@@ -27,10 +24,14 @@ router.post(
   ctrlWrapper(loginUserController),
 );
 
-// router.post('/refresh', ctrlWrapper(refreshSessionController));
-
 router.post('/logout', ctrlWrapper(logoutUserController));
 
 router.post('/refresh', ctrlWrapper(refreshUserSessionController));
+
+router.post(
+  '/request-reset-email',
+  validateBody(requestResetEmailSchema),
+  ctrlWrapper(requestResetEmailController),
+);
 
 export default router;

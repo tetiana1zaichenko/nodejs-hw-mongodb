@@ -50,6 +50,16 @@ export async function getContactByIdController(req, res) {
 
 export const createContactController = async (req, res) => {
   const { name, phoneNumber, contactType } = req.body;
+  const photo = req.file;
+  let photoUrl;
+
+  if (photo) {
+    if (getEnvVar('ENABLE_CLOUDINARY') === 'true') {
+      photoUrl = await saveFileToCloudinary(photo);
+    } else {
+      photoUrl = await saveFileToUploadDir(photo);
+    }
+  }
 
   if (!name || !phoneNumber || !contactType) {
     throw createHttpError(
@@ -58,7 +68,11 @@ export const createContactController = async (req, res) => {
     );
   }
 
-  const contact = await createContact({ ...req.body, userId: req.user._id });
+  const contact = await createContact({
+    ...req.body,
+    photo: photoUrl,
+    userId: req.user._id,
+  });
 
   res.status(201).json({
     status: 201,
@@ -74,22 +88,18 @@ export const patchContactController = async (req, res, next) => {
   let photoUrl;
 
   if (photo) {
-    photoUrl = await saveFileToUploadDir(photo);
+    if (getEnvVar('ENABLE_CLOUDINARY') === 'true') {
+      photoUrl = await saveFileToCloudinary(photo);
+    } else {
+      photoUrl = await saveFileToUploadDir(photo);
+    }
   }
-
-  // if (photo) {
-  //   if (getEnvVar('ENABLE_CLOUDINARY') === 'true') {
-  //     photoUrl = await saveFileToCloudinary(photo);
-  //   } else {
-  //     photoUrl = await saveFileToUploadDir(photo);
-  //   }
-  // }
 
   const updatedContact = await updateContact(
     contactId,
     {
       ...req.body,
-      photo: photoUrl,
+      ...(photoUrl && { photo: photoUrl }),
     },
     req.user._id,
   );
